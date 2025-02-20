@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Weird Hair Accessories ",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
