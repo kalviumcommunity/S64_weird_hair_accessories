@@ -66,3 +66,6 @@ Regional Trends: Showcase popular accessory styles based on geographic data.
 Interactive Exploration: Provide filters for regions, styles, and historical significance.
 
 Check out the live version : https://s64-weird-hair-accessories-1.onrender.com
+
+## 🌍 Deployed Link 
+https://s64-weird-hair-accessories-vjwu.vercel.app/
