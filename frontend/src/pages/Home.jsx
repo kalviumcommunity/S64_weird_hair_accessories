@@ -1,72 +1,55 @@
-import React, { useState, useEffect } from "react";
-import AccessoryCard from "../components/AccessoryCard";
-import { fetchAccessories } from "../api";
+import { useEffect, useState } from "react";
 
-const Home = () => {
-  const [accessories, setAccessories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function Home() {
+    const [accessories, setAccessories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Fallback image URL in case the image URL from the backend is not accessible
-  const fallbackImage = "https://via.placeholder.com/300x200?text=Hair+Accessory";
+    useEffect(() => {
+        const fetchAccessories = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/accessories");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                setAccessories(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  useEffect(() => {
-    const getAccessories = async () => {
-      try {
-        const data = await fetchAccessories();
-        setAccessories(data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch accessories:", err);
-        setError("Failed to load accessories. Please try again later.");
-        setLoading(false);
-      }
-    };
+        fetchAccessories();
+    }, []);
 
-    getAccessories();
-  }, []);
-
-  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-xl font-semibold">Loading accessories...</p>
-      </div>
-    );
-  }
+        <div className="container mx-auto p-6">
+            <h1 className="text-3xl font-bold mb-6 text-center">Weird Hair Accessories</h1>
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-xl font-semibold text-red-500">{error}</p>
-      </div>
-    );
-  }
+            {loading && <p className="text-blue-500 text-center">Loading...</p>}
+            {error && <p className="text-red-500 text-center">Error: {error}</p>}
 
-  // If no accessories are found, show a message
-  if (accessories.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-xl font-semibold">No accessories found.</p>
-      </div>
-    );
-  }
+            {!loading && !error && accessories.length === 0 && (
+                <p className="text-gray-500 text-center">No accessories found.</p>
+            )}
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Weird Hair Accessories</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {accessories.map((accessory) => (
-          <AccessoryCard
-            key={accessory._id}
-            name={accessory.name}
-            type={accessory.type}
-            price={accessory.price}
-            image={accessory.image || fallbackImage}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {accessories.map((accessory) => (
+                    <div key={accessory._id} className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow">
+                        <h2 className="text-xl font-semibold mb-2">{accessory.name}</h2>
+                        <p className="text-gray-600 mb-1">Type: {accessory.type}</p>
+                        {accessory.material && <p className="text-gray-600 mb-1">Material: {accessory.material}</p>}
+                        {accessory.color && <p className="text-gray-600 mb-1">Color: {accessory.color}</p>}
+                        <p className="text-gray-800 font-bold mt-2">Price: ${accessory.price}</p>
+                        {accessory.availability && <p className="text-green-600 mt-1">{accessory.availability}</p>}
+                        {accessory.description && <p className="text-gray-700 mt-2">{accessory.description}</p>}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
 
 export default Home;
